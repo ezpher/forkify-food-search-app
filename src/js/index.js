@@ -6,8 +6,10 @@
 import * as base from './Models/Base.js'; 
 import Search from './Models/Search.js';
 import Recipe from './Models/Recipe.js';
+import List from './Models/List.js';
 import * as searchView from './Views/searchView.js';
 import * as recipeView from './Views/recipeView.js';
+import * as listView from './Views/listView.js';
 
 /* Global state object to hold state for objects across app at a certain point in time */
 /* e.g. search object, current recipe, shopping list etc. */
@@ -74,6 +76,23 @@ const recipeController = async () => {
     }
 }
 
+/** SHOPPING LIST CONTROLLER */
+
+const listController = () => {
+    // create new list if it does not already exists
+    if (!state.List) state.List = new List();
+
+    // add each ingredient to shopping list and UI
+    state.Recipe.ingredients.forEach(ing => {
+        const item = state.List.addItem(ing.count, ing.unit, ing.ingredient);
+        listView.renderItem(item);   
+    });
+}
+
+
+
+/** EVENT LISTENERS */
+
 // event listener for search form submission
 base.elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -96,22 +115,50 @@ base.elements.pageBtnsContainer.addEventListener('click', e => {
 const eventsForRecipe = ['hashchange', 'load']; // for some reason, forEach doesn't work if used on array directly
 eventsForRecipe.forEach(event => {window.addEventListener(event, recipeController)});
 
-// event listeners for increase/decrease servings buttons on recipe
+// event listeners for recipe container buttons e.g. increase/decrease servings buttons
 base.elements.recipeContainer.addEventListener('click', e => {
 
     // use match because you want to precisely match what button is clicked
     // if match is found for the .btn-decrease class or its child elements
 
     if (e.target.matches('.btn-decrease, .btn-decrease *')) {
+        
         // decrease button is clicked
         if (state.Recipe.servings > 1) {
             state.Recipe.updateServings('decrease');
             recipeView.updateServingsIngredients(state.Recipe);
         }        
+
     } else if (e.target.matches('.btn-increase, .btn-increase *')) {
         // increase button is clicked
         state.Recipe.updateServings('increase');
         recipeView.updateServingsIngredients(state.Recipe);
+
+    } else if (e.target.matches('.recipe__btn-add, .recipe__btn-add *')) {
+        listController();
     }
 })
+
+// handle delete and update shopping list item events
+base.elements.shoppingList.addEventListener('click', e => {
+    
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+
+    // handle delete event
+    if (e.target.matches('.shopping__delete, .shopping__delete *')) {
+        // delete from state
+        state.List.deleteItem(id);
+
+        // delete item from UI
+        listView.deleteItem(id); 
+    } else if (e.target.matches('.shopping__count-value')) {
+
+        // update list item count
+        const val = parseFloat(e.target.value, 10);
+        state.List.updateCount(id, val);
+    }
+})
+
+const l = new List();
+window.l = l;
 
