@@ -10,8 +10,18 @@ export const clearRecipes = () => {
     elements.recipeList.innerHTML = '';
 }
 
+export const highlightSelected = id => {
+    const resultsArr = Array.from(document.querySelectorAll('.results__link'));
+    resultsArr.forEach(el => {
+        el.classList.remove('results__link--active');
+    });
+
+    // * means contains as opposed to directly equal
+    document.querySelector(`a[href*="${id}"]`).classList.add('results__link--active');
+}
+
 export const renderRecipe = (recipe) => {
-    const markdown = `
+    const markup = `
     <li>
         <a class="results__link" href="#${recipe.recipe_id}">
             <figure class="results__fig">
@@ -25,7 +35,7 @@ export const renderRecipe = (recipe) => {
     </li>
     `
 
-    elements.recipeList.insertAdjacentHTML('beforeEnd', markdown);
+    elements.recipeList.insertAdjacentHTML('beforeEnd', markup);
 }
 
 export const renderRecipes = (recipes, page = 1, pageSize = 10) => {
@@ -63,6 +73,7 @@ const renderPageBtns = (page, resultsSize, pageSize) => {
         `;
     } else if (page === 1 && pages > 1) {
         // show next btn only
+        // TODO: to fix bug where no search result will still show a next btn
         pageBtn = `${createPageBtn(page, 'next')}`;
     } else if (page === pages && pages > 1) {
         // show prev btn only

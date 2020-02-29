@@ -1,9 +1,10 @@
 export const elements = {
     searchForm: document.querySelector('.search'),
     searchField: document.querySelector('.search__field'),
-    recipeContainer: document.querySelector('.results'),
+    recipeListContainer: document.querySelector('.results'),
     recipeList: document.querySelector('.results__list'),
-    pageBtnsContainer: document.querySelector('.results__pages')
+    pageBtnsContainer: document.querySelector('.results__pages'),
+    recipeContainer: document.querySelector('.recipe')
 }
 
 export const elementString = {
@@ -11,7 +12,7 @@ export const elementString = {
 }
 
 export const showLoaderIcon = parent => {
-    const markdown = `
+    const markup = `
         <div class=${elementString.loader}>
             <svg>
                 <use href="img/icons.svg#icon-cw" />
@@ -19,7 +20,7 @@ export const showLoaderIcon = parent => {
         </div>
     `
 
-    parent.insertAdjacentHTML('afterBegin', markdown);
+    parent.insertAdjacentHTML('afterBegin', markup);
 }
 
 export const clearLoaderIcon = () => {
