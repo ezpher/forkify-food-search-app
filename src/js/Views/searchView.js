@@ -17,7 +17,7 @@ export const highlightSelected = id => {
     });
 
     // * means contains as opposed to directly equal
-    document.querySelector(`a[href*="${id}"]`).classList.add('results__link--active');
+    document.querySelector(`.results__link[href*="${id}"]`).classList.add('results__link--active'); // change selector to select only anchor tags with results__link class
 }
 
 export const renderRecipe = (recipe) => {
@@ -46,7 +46,7 @@ export const renderRecipes = (recipes, page = 1, pageSize = 10) => {
     renderPageBtns(page, recipes.length, pageSize);
 }
 
-const shortenTitle = (title, wordSize = 17) => {
+export const shortenTitle = (title, wordSize = 17) => {
     const newTitleWords = [];
     
     title.split(' ').reduce((acc, cur) => {

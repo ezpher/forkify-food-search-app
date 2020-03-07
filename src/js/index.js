@@ -7,9 +7,11 @@ import * as base from './Models/Base.js';
 import Search from './Models/Search.js';
 import Recipe from './Models/Recipe.js';
 import List from './Models/List.js';
+import Likes from './Models/Likes.js';
 import * as searchView from './Views/searchView.js';
 import * as recipeView from './Views/recipeView.js';
 import * as listView from './Views/listView.js';
+import * as likesView from './Views/likesView';
 
 /* Global state object to hold state for objects across app at a certain point in time */
 /* e.g. search object, current recipe, shopping list etc. */
@@ -71,7 +73,10 @@ const recipeController = async () => {
 
         // Render recipe
         base.clearLoaderIcon();
-        recipeView.renderRecipe(state.Recipe);
+        recipeView.renderRecipe(
+            state.Recipe,
+            state.Likes.isLiked(id) // need to know if recipe is already liked or not when rendering recipe
+        );
         // console.log(state.Recipe);
     }
 }
@@ -90,6 +95,47 @@ const listController = () => {
 }
 
 
+/** LIKES CONTROLLER */
+
+// temporarily add for when app loads for the first time
+state.Likes = new Likes();
+likesView.toggleLikeMenu(state.Likes.getNumLikes());
+
+const likeController = () => {
+    if (!state.Likes) state.Likes = new Likes();
+    const currentID = state.Recipe.id;
+
+    if (!state.Likes.isLiked(currentID)) {
+        // add like to likes
+        const newLike = state.Likes.addLike(
+            currentID,
+            state.Recipe.title,
+            state.Recipe.author,
+            state.Recipe.img
+        )
+
+        // toggle the like icon
+        likesView.toggleLikeBtn(true);        
+
+        // add to UI list
+        likesView.renderLike(newLike);
+        // console.log(state.Likes);
+
+    } else {
+        // user has liked current recipe
+        state.Likes.deleteLike(currentID);
+
+        // toggle the like icon
+        likesView.toggleLikeBtn(false);
+
+        // remove like from UI list
+        likesView.deleteLike(currentID);
+        // console.log(state.Likes);
+    }
+
+    likesView.toggleLikeMenu(state.Likes.getNumLikes());
+
+}
 
 /** EVENT LISTENERS */
 
@@ -136,6 +182,8 @@ base.elements.recipeContainer.addEventListener('click', e => {
 
     } else if (e.target.matches('.recipe__btn-add, .recipe__btn-add *')) {
         listController();
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+        likeController();
     }
 })
 
